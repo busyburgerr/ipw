@@ -114,6 +114,51 @@ func (s *PostgresStore) GetFreelancer(ctx context.Context, userID uuid.UUID) (*F
 	}, nil
 }
 
+// ListFreelancers returns filled-in freelancer profiles for the public
+// directory, best-rated first.
+func (s *PostgresStore) ListFreelancers(ctx context.Context, f FreelancerFilter) ([]Freelancer, error) {
+	q := s.db.WithContext(ctx).Model(&freelancerRow{}).
+		Where("headline <> ''")
+	if f.Query != "" {
+		like := "%" + f.Query + "%"
+		q = q.Where("headline ILIKE ? OR bio ILIKE ?", like, like)
+	}
+	if f.CategorySlug != "" {
+		q = q.Where("primary_category_id = (SELECT id FROM categories WHERE slug = ?)", f.CategorySlug)
+	}
+	limit := f.Limit
+	if limit <= 0 || limit > 100 {
+		limit = 30
+	}
+
+	var rows []freelancerRow
+	err := q.Order("rating_avg DESC, jobs_completed DESC").
+		Limit(limit).Offset(f.Offset).Find(&rows).Error
+	if err != nil {
+		return nil, err
+	}
+
+	out := make([]Freelancer, len(rows))
+	for i, row := range rows {
+		langs := []string{}
+		if len(row.Languages) > 0 {
+			_ = json.Unmarshal(row.Languages, &langs)
+		}
+		skillIDs := []uuid.UUID{}
+		_ = s.db.WithContext(ctx).Model(&freelancerSkillRow{}).
+			Where("user_id = ?", row.UserID).Pluck("skill_id", &skillIDs)
+		out[i] = Freelancer{
+			UserID: row.UserID, Headline: row.Headline, Bio: row.Bio,
+			HourlyRateCents: row.HourlyRateCents, Currency: row.Currency,
+			Availability: Availability(row.Availability), PrimaryCategoryID: row.PrimaryCategoryID,
+			Languages: langs, Location: row.Location, SkillIDs: skillIDs,
+			RatingAvg: row.RatingAvg, RatingCount: row.RatingCount,
+			JobsCompleted: row.JobsCompleted, TotalEarnedCents: row.TotalEarnedCents,
+		}
+	}
+	return out, nil
+}
+
 // UpsertFreelancer writes the editable fields only; reputation aggregates are
 // owned by other features and never touched here.
 func (s *PostgresStore) UpsertFreelancer(ctx context.Context, f *Freelancer) error {

@@ -2,32 +2,11 @@
   <div class="wrapper">
     <NuxtLayout>
       <div class="container">
-        <NuxtPage/>
+        <NuxtPage />
       </div>
     </NuxtLayout>
   </div>
 </template>
-
-<script lang="ts">
-import {defineComponent} from 'vue'
-import ResumeComponent from "~/components/ResumeComponent.vue";
-import VacancyComponent from "~/pages/vacancies/components/VacancyComponent.vue";
-
-export default defineComponent({
-  components: {
-    ResumeComponent,
-    VacancyComponent,
-  },
-  head() {
-    definePageMeta({
-      layout: 'default',
-    })
-  },
-  // setup() {
-  //   console.log("bongaclamms ^)")
-  // }
-})
-</script>
 
 <style scoped>
 * {

@@ -69,8 +69,17 @@ type PortfolioItem struct {
 	Position    int
 }
 
+// FreelancerFilter narrows the public freelancer directory.
+type FreelancerFilter struct {
+	Query        string
+	CategorySlug string
+	Limit        int
+	Offset       int
+}
+
 type Store interface {
 	GetFreelancer(ctx context.Context, userID uuid.UUID) (*Freelancer, error)
+	ListFreelancers(ctx context.Context, f FreelancerFilter) ([]Freelancer, error)
 	UpsertFreelancer(ctx context.Context, f *Freelancer) error
 	SetFreelancerSkills(ctx context.Context, userID uuid.UUID, skillIDs []uuid.UUID) error
 

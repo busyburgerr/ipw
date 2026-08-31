@@ -1,63 +1,36 @@
-# Nuxt 3 Minimal Starter
+# IPW frontend
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+The original "IT Professionals Work" Nuxt design, rewired to the freelance
+marketplace API.
 
-## Setup
+- Nuxt 3, plain axios + js-cookie (no Pinia, no socket.io)
+- Auth: access token in the `ipw` cookie, refresh token in `ipw_refresh`,
+  transparent refresh-on-401 in `composables/useApi.ts`
+- The old blue-gradient look is kept: `assets/css/style.css` plus the
+  per-page CSS under `pages/**/assets/css/`
 
-Make sure to install the dependencies:
+## Run
 
-```bash
-# npm
+```sh
+# backend must be running (see ../backend/README.md)
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
+npm run dev            # http://localhost:3000
 ```
 
-## Development Server
+Override the API base: `NUXT_PUBLIC_API_BASE=https://api.example.com/api/v1 npm run dev`
 
-Start the development server on `http://localhost:3000`:
+## Route map (old -> new)
 
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+| route | was | now |
+|---|---|---|
+| `/projects` | вакансии | список проектов |
+| `/projects/:id` | вакансия | проект + отклик / список откликов |
+| `/projects/new`, `/projects/:id/edit` | создание вакансии | создание / редактирование проекта |
+| `/freelancers`, `/freelancers/:id` | резюме | каталог фрилансеров / профиль |
+| `/clients/:id` | компания | профиль заказчика |
+| `/profile` | профиль + резюме | кабинет: профиль фрилансера и заказчика |
+| `/requests` | отклики (HR) | мои проекты (заказчик) |
+| `/my-proposals` | — | мои отклики (фрилансер) |
+| `/contracts`, `/contracts/:id` | — | контракты, этапы, escrow, отзывы, споры |
+| `/wallet` | — | баланс и выплаты |
+| `/admin` | — | арбитраж споров |

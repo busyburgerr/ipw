@@ -4,65 +4,35 @@
       <div class="header_logo">
         <NuxtLink to="/">IPW</NuxtLink>
       </div>
-      <NuxtLink class="header_requests" to="/requests" v-if="usrRole == 'HR'">Отклики</NuxtLink>
-      <!--      <button class="header_notification" @click="openModal">notify</button>-->
+      <NuxtLink class="header_requests" to="/requests" v-if="user?.isClient">Отклики</NuxtLink>
     </div>
     <nav class="navbar">
-<!--      <div v-if="route.path != '/' && route.path != '/profile' && route.path != '/auth'">-->
-<!--        <NuxtLink class="btn" to="/profile">Профиль</NuxtLink>-->
-<!--      </div>-->
-      <!--      <NuxtLink to="/messenger">Чат</NuxtLink>-->
-      <NuxtLink to="/resumes">Резюме</NuxtLink>
-      <NuxtLink to="/vacancies">Вакансии</NuxtLink>
-      <NuxtLink :class="{'disable':isActive}" v-if="isActive" :to="isActive ? '/' : '/about'">О нас</NuxtLink>
+      <NuxtLink to="/projects">Проекты</NuxtLink>
+      <NuxtLink to="/freelancers">Фрилансеры</NuxtLink>
+      <template v-if="isAuthed">
+        <NuxtLink to="/profile">Профиль</NuxtLink>
+        <NuxtLink to="/wallet" v-if="user?.isFreelancer">Кошелёк</NuxtLink>
+        <NuxtLink to="/admin" v-if="user?.isAdmin">Арбитраж</NuxtLink>
+        <button class="btn" @click="onLogout">Выйти</button>
+      </template>
+      <NuxtLink to="/auth" v-else>Войти</NuxtLink>
     </nav>
   </header>
-  <div class="modal" v-if="showModal">
-    <NotifyModalComponent :closeModal="closeModal"/>
-  </div>
-  <slot/>
+
+  <slot />
+
   <footer>
     <NuxtLink class="police-privacy" to="/policy">Политика конфиденциальности</NuxtLink>
   </footer>
 </template>
 
 <script setup lang="ts">
-import {defineComponent, ref} from "vue";
-import NotifyModalComponent from "/components/NotifyModalComponent.vue"
-import ResumeComponent from "~/components/ResumeComponent.vue";
-import VacancyComponent from "~/pages/vacancies/components/VacancyComponent.vue";
-import axios from "axios";
+const { user, isAuthed, init, logout } = useAuth()
+await init()
 
-const usrRole = ref('')
-
-onMounted(async () => {
-  try {
-    const res = await axios.get('http://localhost:5000/data/v1/user', {withCredentials: true})
-    usrRole.value = res.data.role.role_name
-  } catch (e) {
-    console.log(e)
-  }
-})
-
-defineComponent({
-  components: {
-    NotifyModalComponent,
-  },
-})
-let isActive = ref(true)
-const route = useRoute()
-const router = useRouter()
-// onMounted(() => {
-//   if (route.path == '/messenger') {
-//     router.push('/')
-//   }
-// })
-let showModal = ref(false)
-const openModal = () => {
-  showModal.value = true
-}
-const closeModal = () => {
-  showModal.value = false
+async function onLogout() {
+  await logout()
+  await navigateTo('/')
 }
 </script>
 
@@ -85,10 +55,14 @@ footer {
 }
 
 .header_requests {
-  color: #FFF;
+  color: #fff;
   font-size: 16px;
-  font-style: normal;
   font-weight: 500;
-  line-height: normal;
+}
+
+.navbar .btn {
+  font-family: Raleway, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
 }
 </style>

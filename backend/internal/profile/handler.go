@@ -3,6 +3,7 @@ package profile
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"ipw/internal/auth"
 	"ipw/internal/catalog"
@@ -31,6 +32,7 @@ func NewHandler(svc *Service, users user.Store, cat catalog.Store, files *storag
 
 func (h *Handler) Register(app *fiber.App) {
 	// Public profile views.
+	app.Get("/api/v1/freelancers", h.listFreelancers)
 	pub := app.Group("/api/v1/profiles")
 	pub.Get("/freelancers/:userId", h.publicFreelancer)
 	pub.Get("/clients/:userId", h.publicClient)
@@ -104,6 +106,27 @@ type portfolioDTO struct {
 }
 
 // ---- handlers ------------------------------------------------------------
+
+func (h *Handler) listFreelancers(c *fiber.Ctx) error {
+	list, err := h.svc.ListFreelancers(c.Context(), FreelancerFilter{
+		Query:        strings.TrimSpace(c.Query("q")),
+		CategorySlug: strings.TrimSpace(c.Query("category")),
+		Limit:        c.QueryInt("limit", 30),
+		Offset:       c.QueryInt("offset", 0),
+	})
+	if err != nil {
+		return err
+	}
+	out := make([]freelancerDTO, len(list))
+	for i := range list {
+		dto, err := h.freelancerToDTO(c.Context(), &list[i])
+		if err != nil {
+			return err
+		}
+		out[i] = dto
+	}
+	return httpx.OK(c, fiber.Map{"freelancers": out})
+}
 
 func (h *Handler) publicFreelancer(c *fiber.Ctx) error {
 	uid, err := uuid.Parse(c.Params("userId"))

@@ -34,6 +34,10 @@ func (s *Service) GetFreelancer(ctx context.Context, userID uuid.UUID) (*Freelan
 	return s.store.GetFreelancer(ctx, userID)
 }
 
+func (s *Service) ListFreelancers(ctx context.Context, f FreelancerFilter) ([]Freelancer, error) {
+	return s.store.ListFreelancers(ctx, f)
+}
+
 func (s *Service) SaveFreelancer(ctx context.Context, userID uuid.UUID, in FreelancerInput) (*Freelancer, error) {
 	availability := Availability(strings.TrimSpace(in.Availability))
 	if availability == "" {
