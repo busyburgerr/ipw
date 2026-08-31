@@ -182,27 +182,6 @@ func (s *Service) AddMilestone(ctx context.Context, clientID, contractID uuid.UU
 	return m, nil
 }
 
-// FundMilestone moves a milestone into escrow.
-//
-// TODO(payments): this is currently a structural transition only. The payments
-// feature will replace the body with: create a lava.top invoice, and on webhook
-// confirmation debit the client and credit the milestone's escrow account
-// before flipping the status.
-func (s *Service) FundMilestone(ctx context.Context, clientID, milestoneID uuid.UUID) (*Milestone, error) {
-	m, _, err := s.milestoneForClient(ctx, clientID, milestoneID)
-	if err != nil {
-		return nil, err
-	}
-	if m.Status != MilestonePending {
-		return nil, httpx.ErrConflict("milestone is not pending")
-	}
-	if err := s.store.UpdateMilestoneStatus(ctx, milestoneID, MilestoneFunded,
-		map[string]time.Time{"funded_at": time.Now()}, ""); err != nil {
-		return nil, err
-	}
-	return s.store.GetMilestone(ctx, milestoneID)
-}
-
 func (s *Service) SubmitMilestone(ctx context.Context, freelancerID, milestoneID uuid.UUID, note string) (*Milestone, error) {
 	m, c, err := s.milestoneWithContract(ctx, milestoneID)
 	if err != nil {
@@ -230,26 +209,6 @@ func (s *Service) RequestMilestoneChanges(ctx context.Context, clientID, milesto
 		return nil, httpx.ErrConflict("milestone is not awaiting review")
 	}
 	if err := s.store.UpdateMilestoneStatus(ctx, milestoneID, MilestoneFunded, nil, ""); err != nil {
-		return nil, err
-	}
-	return s.store.GetMilestone(ctx, milestoneID)
-}
-
-// ApproveMilestone accepts the submitted work.
-//
-// TODO(payments): after approval the payments feature releases the escrowed
-// amount to the freelancer's balance (minus platform commission) and moves the
-// milestone to "released".
-func (s *Service) ApproveMilestone(ctx context.Context, clientID, milestoneID uuid.UUID) (*Milestone, error) {
-	m, _, err := s.milestoneForClient(ctx, clientID, milestoneID)
-	if err != nil {
-		return nil, err
-	}
-	if m.Status != MilestoneSubmitted {
-		return nil, httpx.ErrConflict("milestone is not awaiting review")
-	}
-	if err := s.store.UpdateMilestoneStatus(ctx, milestoneID, MilestoneApproved,
-		map[string]time.Time{"approved_at": time.Now()}, ""); err != nil {
 		return nil, err
 	}
 	return s.store.GetMilestone(ctx, milestoneID)

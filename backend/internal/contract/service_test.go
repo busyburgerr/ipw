@@ -123,7 +123,7 @@ func TestAddMilestoneRejectsOverAllocation(t *testing.T) {
 	}
 }
 
-func TestMilestoneStateMachine(t *testing.T) {
+func TestSubmitAndRequestChanges(t *testing.T) {
 	store := newMemStore()
 	svc, c, clientID := seedContract(store)
 	ctx := context.Background()
@@ -134,25 +134,28 @@ func TestMilestoneStateMachine(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Cannot submit before funding.
+	// Cannot submit a pending (unfunded) milestone.
 	if _, err := svc.SubmitMilestone(ctx, freelancerID, m.ID, "wip"); err == nil {
 		t.Fatal("submit before fund should fail")
 	}
-	if _, err := svc.FundMilestone(ctx, clientID, m.ID); err != nil {
-		t.Fatal(err)
-	}
-	// Wrong actor.
+
+	// Billing would fund it; simulate that here.
+	store.milestones[m.ID].Status = MilestoneFunded
+
 	if _, err := svc.SubmitMilestone(ctx, uuid.New(), m.ID, "x"); err == nil {
 		t.Fatal("stranger submit should fail")
 	}
 	if _, err := svc.SubmitMilestone(ctx, freelancerID, m.ID, "done"); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := svc.ApproveMilestone(ctx, clientID, m.ID); err != nil {
+	if _, err := svc.RequestMilestoneChanges(ctx, clientID, m.ID); err != nil {
 		t.Fatal(err)
 	}
-	// Approve again -> conflict.
-	if _, err := svc.ApproveMilestone(ctx, clientID, m.ID); err == nil {
-		t.Fatal("re-approve should fail")
+	if got := store.milestones[m.ID].Status; got != MilestoneFunded {
+		t.Fatalf("request-changes should return milestone to funded, got %s", got)
+	}
+	// Cancelling is only allowed while pending.
+	if _, err := svc.CancelMilestone(ctx, clientID, m.ID); err == nil {
+		t.Fatal("cancel of a funded milestone should fail")
 	}
 }

@@ -34,8 +34,7 @@ func (h *Handler) Register(app *fiber.App) {
 	g.Post("/contracts/:id/milestones", append(clone(client), h.addMilestone)...)
 	g.Post("/contracts/:id/complete", append(clone(client), h.completeContract)...)
 
-	g.Post("/milestones/:id/fund", append(clone(client), h.fundMilestone)...)
-	g.Post("/milestones/:id/approve", append(clone(client), h.approveMilestone)...)
+	// fund / approve move money and live in the billing feature.
 	g.Post("/milestones/:id/request-changes", append(clone(client), h.requestChanges)...)
 	g.Post("/milestones/:id/cancel", append(clone(client), h.cancelMilestone)...)
 	g.Post("/milestones/:id/submit", append(clone(freelancer), h.submitMilestone)...)
@@ -184,10 +183,6 @@ func (h *Handler) completeContract(c *fiber.Ctx) error {
 	return httpx.OK(c, toContractDTO(ct))
 }
 
-func (h *Handler) fundMilestone(c *fiber.Ctx) error { return h.milestoneAction(c, h.svc.FundMilestone) }
-func (h *Handler) approveMilestone(c *fiber.Ctx) error {
-	return h.milestoneAction(c, h.svc.ApproveMilestone)
-}
 func (h *Handler) cancelMilestone(c *fiber.Ctx) error {
 	return h.milestoneAction(c, h.svc.CancelMilestone)
 }
