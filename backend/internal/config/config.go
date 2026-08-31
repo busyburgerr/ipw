@@ -22,6 +22,7 @@ type Config struct {
 	Auth    AuthConfig
 	Lava    LavaConfig
 	Storage StorageConfig
+	Billing BillingConfig
 }
 
 type HTTPConfig struct {
@@ -64,6 +65,13 @@ type LavaConfig struct {
 	APIKey     string
 	WebhookKey string // shared secret to verify incoming webhooks
 	BaseURL    string
+	OfferID    string
+}
+
+// BillingConfig holds the platform's money parameters.
+type BillingConfig struct {
+	CommissionBps  int64 // platform cut of each released milestone, basis points
+	PayoutMinCents int64
 }
 
 // StorageConfig points at an S3-compatible object store (MinIO locally).
@@ -112,6 +120,11 @@ func Load() (Config, error) {
 			APIKey:     os.Getenv("LAVA_API_KEY"),
 			WebhookKey: os.Getenv("LAVA_WEBHOOK_KEY"),
 			BaseURL:    env("LAVA_BASE_URL", "https://gate.lava.top"),
+			OfferID:    os.Getenv("LAVA_OFFER_ID"),
+		},
+		Billing: BillingConfig{
+			CommissionBps:  int64(envInt("PLATFORM_COMMISSION_BPS", 1000)), // 10%
+			PayoutMinCents: int64(envInt("PAYOUT_MIN_CENTS", 100000)),      // 1000 RUB
 		},
 		Storage: StorageConfig{
 			Endpoint:      env("STORAGE_ENDPOINT", "localhost:9000"),

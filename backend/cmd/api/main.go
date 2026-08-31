@@ -11,16 +11,20 @@ import (
 	"time"
 
 	"ipw/internal/auth"
+	"ipw/internal/billing"
 	"ipw/internal/catalog"
 	"ipw/internal/config"
 	"ipw/internal/contract"
 	"ipw/internal/httpx"
+	"ipw/internal/ledger"
+	"ipw/internal/payment"
 	"ipw/internal/platform/postgres"
 	"ipw/internal/platform/redis"
 	"ipw/internal/platform/storage"
 	"ipw/internal/profile"
 	"ipw/internal/project"
 	"ipw/internal/user"
+	"ipw/internal/wallet"
 )
 
 func main() {
@@ -92,6 +96,21 @@ func run(log *slog.Logger) error {
 	contractStore := contract.NewPostgresStore(db)
 	contractSvc := contract.NewService(contractStore, projectStore)
 	contract.NewHandler(contractSvc, authMW).Register(app)
+
+	ldg := ledger.New(db)
+	walletSvc := wallet.NewService(ldg, cfg.Billing.CommissionBps)
+
+	var payProvider payment.Provider
+	if cfg.Lava.APIKey != "" {
+		payProvider = payment.NewLavaProvider(cfg.Lava.APIKey, cfg.Lava.WebhookKey, cfg.Lava.BaseURL, cfg.Lava.OfferID)
+		log.Info("payment provider: lava.top")
+	} else {
+		payProvider = payment.NewStubProvider(cfg.Lava.WebhookKey, "http://localhost:"+cfg.HTTP.Port)
+		log.Warn("payment provider: stub (LAVA_API_KEY not set)")
+	}
+	paymentSvc := payment.NewService(payment.NewPostgresStore(db), payProvider)
+	billingSvc := billing.NewService(db, contractStore, paymentSvc, walletSvc, users, cfg.Billing)
+	billing.NewHandler(billingSvc, paymentSvc, authMW, !cfg.IsProd()).Register(app)
 	// Additional feature routers are registered here as they are built.
 	// -----------------------------------------------------------------------
 
