@@ -1,0 +1,106 @@
+.resume_block {
+    display: flex;
+    width: 815px;
+    padding: 20px 30px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 20px;
+    background: #FFF;
+    color: #000;
+}
+
+.resume_header_block {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.resume_userInfo_block {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.resume_logo {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    background-color: #d9d9d9;
+    border-radius: 5px;
+}
+
+.resume_content_block {
+    display: flex;
+    padding: 5px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    align-self: stretch;
+}
+
+.resume_nameTag_block {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.resume_name {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.resume_tag {
+    color: rgba(0, 0, 0, 0.70);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.resume_secondInfo_block {
+    display: flex;
+    height: 65px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    align-self: stretch;
+}
+
+.resume_levelDirection {
+    font-size: 24px;
+    font-weight: 700;
+    color: #000;
+}
+
+.resume_locationWorkTime {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.resume_email {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.resume_salary {
+    font-size: 24px;
+    font-weight: 500;
+}
+
+.resume_description_block {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.resume_skills_block {
+
+}
+
+.resume_btnBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
