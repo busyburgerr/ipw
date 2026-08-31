@@ -13,6 +13,7 @@ import (
 	"ipw/internal/auth"
 	"ipw/internal/catalog"
 	"ipw/internal/config"
+	"ipw/internal/contract"
 	"ipw/internal/httpx"
 	"ipw/internal/platform/postgres"
 	"ipw/internal/platform/redis"
@@ -87,6 +88,10 @@ func run(log *slog.Logger) error {
 	projectStore := project.NewPostgresStore(db)
 	projectSvc := project.NewService(projectStore, catalogStore)
 	project.NewHandler(projectSvc, authMW).Register(app)
+
+	contractStore := contract.NewPostgresStore(db)
+	contractSvc := contract.NewService(contractStore, projectStore)
+	contract.NewHandler(contractSvc, authMW).Register(app)
 	// Additional feature routers are registered here as they are built.
 	// -----------------------------------------------------------------------
 
