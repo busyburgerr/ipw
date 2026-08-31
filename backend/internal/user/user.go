@@ -44,5 +44,6 @@ type Store interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*User, error)
 	GetByEmail(ctx context.Context, email string) (*User, error)
 	Update(ctx context.Context, u *User) error
+	SetAvatarURL(ctx context.Context, id uuid.UUID, url string) error
 	EmailExists(ctx context.Context, email string) (bool, error)
 }

@@ -1,6 +1,7 @@
 package httpx
 
 import (
+	"errors"
 	"log/slog"
 	"time"
 
@@ -43,16 +44,46 @@ func requestLogger(log *slog.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		start := time.Now()
 		err := c.Next()
-		log.Info("http_request",
+
+		// The central ErrorHandler runs after this middleware returns, so derive
+		// the eventual status from the error rather than the not-yet-written
+		// response.
+		status := c.Response().StatusCode()
+		if err != nil {
+			var de *DomainError
+			var fe *fiber.Error
+			switch {
+			case errors.As(err, &de):
+				status = de.Status
+			case errors.As(err, &fe):
+				status = fe.Code
+			default:
+				status = fiber.StatusInternalServerError
+			}
+		}
+
+		attrs := []any{
 			slog.String("method", c.Method()),
 			slog.String("path", c.Path()),
-			slog.Int("status", c.Response().StatusCode()),
+			slog.Int("status", status),
 			slog.Duration("took", time.Since(start)),
-			slog.String("request_id", c.Locals("requestid").(string)),
+			slog.String("request_id", requestID(c)),
 			slog.String("ip", c.IP()),
-		)
+		}
+		if err != nil && status >= 500 {
+			log.Error("http_request", append(attrs, slog.Any("err", err))...)
+		} else {
+			log.Info("http_request", attrs...)
+		}
 		return err
 	}
+}
+
+func requestID(c *fiber.Ctx) string {
+	if id, ok := c.Locals("requestid").(string); ok {
+		return id
+	}
+	return ""
 }
 
 func joinOrigins(origins []string) string {

@@ -118,6 +118,12 @@ func (s *PostgresStore) Update(ctx context.Context, u *User) error {
 	return s.db.WithContext(ctx).Model(&row{}).Where("id = ?", u.ID).Save(&rec).Error
 }
 
+func (s *PostgresStore) SetAvatarURL(ctx context.Context, id uuid.UUID, url string) error {
+	return s.db.WithContext(ctx).Model(&row{}).
+		Where("id = ?", id).
+		Updates(map[string]any{"avatar_url": url, "updated_at": time.Now()}).Error
+}
+
 func (s *PostgresStore) EmailExists(ctx context.Context, email string) (bool, error) {
 	var count int64
 	err := s.db.WithContext(ctx).Model(&row{}).Where("email = ?", email).Count(&count).Error
