@@ -1,0 +1,110 @@
+.vacancies_item_block {
+    display: flex;
+    /*width: 815px;*/
+    /*width: calc(50% - 4.5rem);*/
+    padding: 30px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 15px;
+    border-radius: 20px;
+    background: #FFF;
+    color: #000;
+}
+.vacancies_item_header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+}
+.vacancies_item_logo {
+    min-width: 90px;
+    min-height: 90px;
+    border-radius: 5px;
+    background: #D9D9D9;
+}
+.vacancies_item_vacanciesInfo {
+    display: flex;
+    padding: 10px 0;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+}
+.vacancies_item_vacanciesInfo_header {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    align-self: stretch;
+}
+
+.vacancies_item_name, .vacancies_item_tag, .vacancies_item_levelDirection,
+.vacancies_item_location, .vacancies_item_description, .vacancies_item_skills {
+    color: #000;
+    font-family: Inter, sans-serif;
+    font-style: normal;
+    line-height: normal;
+}
+
+.vacancies_item_name {
+    font-size: 16px;
+    font-weight: 700;
+}
+.vacancies_item_tag {
+    color: rgba(0, 0, 0, 0.70);
+    font-size: 14px;
+    font-weight: 500;
+}
+.vacancies_item_levelDirection {
+    font-size: 24px;
+    font-weight: 700;
+}
+.vacancies_item_location {
+    font-size: 12px;
+    font-weight: 500;
+}
+.vacancies_item_description {
+    font-size: 13px;
+    font-weight: 500;
+}
+.vacancies_item_skills {
+    font-size: 11px;
+    font-weight: 500;
+}
+.vacancies_item_btnBlock {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    align-self: stretch;
+}
+.send {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    background: #4E92F8;
+    color: #FFF;
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+.success {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    border-radius: 5px;
+    background: #198754;
+    color: #FFF;
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}

@@ -1,0 +1,29 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@types/js-cookie": "^3.0.3",
+    "@types/node": "^18.17.1",
+    "@types/socket.io-client": "^3.0.0",
+    "nuxt": "^3.8.0"
+  },
+  "dependencies": {
+    "@nuxt/http": "^0.6.4",
+    "@nuxt/types": "^2.17.1",
+    "@nuxtjs/dotenv": "^1.4.1",
+    "axios": "^1.5.1",
+    "js-cookie": "^3.0.5",
+    "nuxt-socket-io": "^3.0.10",
+    "sails.io.js": "^1.2.1",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^2.2.0"
+  }
+}

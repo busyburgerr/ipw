@@ -1,0 +1,23 @@
+# Secrets / local env
+**/.env
+**/.env.local
+*.pem
+
+# Go
+/backend/bin/
+/backend/tmp/
+*.test
+*.out
+coverage.*
+
+# Node / Nuxt
+node_modules/
+/frontend/.nuxt/
+/frontend/.output/
+/frontend/dist/
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+*.swp

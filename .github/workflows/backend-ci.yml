@@ -1,0 +1,56 @@
+name: backend-ci
+
+on:
+  push:
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+  pull_request:
+    paths: ["backend/**", ".github/workflows/backend-ci.yml"]
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ipw
+          POSTGRES_PASSWORD: ipw_local_dev
+          POSTGRES_DB: ipw
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ipw" --health-interval 5s
+          --health-timeout 3s --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s
+          --health-timeout 3s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - run: go build ./...
+      - run: go vet ./...
+      - run: go test ./... -race -count=1
+        env:
+          DB_PASSWORD: ipw_local_dev
+          JWT_SECRET: ci_only_secret_ci_only_secret_ci_only_secret_00
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: backend
+          version: latest
