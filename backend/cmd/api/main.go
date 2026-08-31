@@ -18,6 +18,7 @@ import (
 	"ipw/internal/platform/redis"
 	"ipw/internal/platform/storage"
 	"ipw/internal/profile"
+	"ipw/internal/project"
 	"ipw/internal/user"
 )
 
@@ -82,6 +83,10 @@ func run(log *slog.Logger) error {
 	profileStore := profile.NewPostgresStore(db)
 	profileSvc := profile.NewService(profileStore, catalogStore)
 	profile.NewHandler(profileSvc, users, catalogStore, files, authMW).Register(app)
+
+	projectStore := project.NewPostgresStore(db)
+	projectSvc := project.NewService(projectStore, catalogStore)
+	project.NewHandler(projectSvc, authMW).Register(app)
 	// Additional feature routers are registered here as they are built.
 	// -----------------------------------------------------------------------
 

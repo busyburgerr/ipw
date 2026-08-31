@@ -46,6 +46,27 @@ func (m *Middleware) RequireAuth() fiber.Handler {
 	}
 }
 
+// OptionalAuth attaches the caller's identity when a valid token is present but
+// never rejects the request. Use for endpoints whose response varies by viewer
+// (e.g. a project draft visible only to its owner).
+func (m *Middleware) OptionalAuth() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		raw := bearerToken(c)
+		if raw == "" {
+			return c.Next()
+		}
+		claims, err := m.tokens.parseAccess(raw)
+		if err != nil {
+			return c.Next()
+		}
+		if uid, err := uuid.Parse(claims.Subject); err == nil {
+			c.Locals(localsUserID, uid)
+			c.Locals(localsClaims, claims)
+		}
+		return c.Next()
+	}
+}
+
 // RequireCapability ensures the caller has a given capability. Must run after
 // RequireAuth.
 func (m *Middleware) RequireCapability(cap Capability) fiber.Handler {
