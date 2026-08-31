@@ -15,6 +15,7 @@ import (
 	"ipw/internal/catalog"
 	"ipw/internal/config"
 	"ipw/internal/contract"
+	"ipw/internal/dispute"
 	"ipw/internal/httpx"
 	"ipw/internal/ledger"
 	"ipw/internal/payment"
@@ -23,6 +24,7 @@ import (
 	"ipw/internal/platform/storage"
 	"ipw/internal/profile"
 	"ipw/internal/project"
+	"ipw/internal/review"
 	"ipw/internal/user"
 	"ipw/internal/wallet"
 )
@@ -111,6 +113,12 @@ func run(log *slog.Logger) error {
 	paymentSvc := payment.NewService(payment.NewPostgresStore(db), payProvider)
 	billingSvc := billing.NewService(db, contractStore, paymentSvc, walletSvc, users, cfg.Billing)
 	billing.NewHandler(billingSvc, paymentSvc, authMW, !cfg.IsProd()).Register(app)
+
+	reviewSvc := review.NewService(review.NewPostgresStore(db), contractStore, profileStore)
+	review.NewHandler(reviewSvc, authMW).Register(app)
+
+	disputeSvc := dispute.NewService(dispute.NewPostgresStore(db), contractStore, billingSvc)
+	dispute.NewHandler(disputeSvc, authMW).Register(app)
 	// Additional feature routers are registered here as they are built.
 	// -----------------------------------------------------------------------
 

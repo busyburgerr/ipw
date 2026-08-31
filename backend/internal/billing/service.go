@@ -104,6 +104,9 @@ func (s *Service) ApproveMilestone(ctx context.Context, clientID, milestoneID uu
 	if err != nil {
 		return nil, err
 	}
+	if c.Status != contract.StatusActive {
+		return nil, httpx.ErrConflict("contract is not active")
+	}
 	if m.Status != contract.MilestoneSubmitted {
 		return nil, httpx.ErrConflict("milestone is not awaiting review")
 	}
@@ -129,6 +132,9 @@ func (s *Service) RefundMilestone(ctx context.Context, clientID, milestoneID uui
 	if err != nil {
 		return nil, err
 	}
+	if c.Status != contract.StatusActive {
+		return nil, httpx.ErrConflict("contract is not active")
+	}
 	if m.Status != contract.MilestoneFunded {
 		return nil, httpx.ErrConflict("only a funded milestone that has no submitted work can be refunded")
 	}
@@ -139,6 +145,56 @@ func (s *Service) RefundMilestone(ctx context.Context, clientID, milestoneID uui
 		return nil, err
 	}
 	return s.contracts.GetMilestone(ctx, m.ID)
+}
+
+// ---- arbiter-forced resolutions (used by the dispute feature) --------
+
+// AdminReleaseMilestone releases a funded or submitted milestone's escrow to the
+// freelancer without the client's approval. For dispute resolution only.
+func (s *Service) AdminReleaseMilestone(ctx context.Context, milestoneID uuid.UUID) error {
+	m, c, err := s.milestoneAny(ctx, milestoneID)
+	if err != nil {
+		return err
+	}
+	if m.Status != contract.MilestoneFunded && m.Status != contract.MilestoneSubmitted {
+		return httpx.ErrConflict("milestone is not funded")
+	}
+	if _, _, err := s.wallet.ReleaseEscrow(ctx, c.ID, m.ID, c.FreelancerID, m.AmountCents); err != nil {
+		return err
+	}
+	return s.contracts.UpdateMilestoneStatus(ctx, m.ID, contract.MilestoneReleased,
+		map[string]time.Time{"released_at": time.Now(), "approved_at": time.Now()}, "")
+}
+
+// AdminRefundMilestone returns a funded or submitted milestone's escrow to the
+// client. For dispute resolution only.
+func (s *Service) AdminRefundMilestone(ctx context.Context, milestoneID uuid.UUID) error {
+	m, c, err := s.milestoneAny(ctx, milestoneID)
+	if err != nil {
+		return err
+	}
+	if m.Status != contract.MilestoneFunded && m.Status != contract.MilestoneSubmitted {
+		return httpx.ErrConflict("milestone is not funded")
+	}
+	if err := s.wallet.RefundEscrow(ctx, c.ID, m.ID, m.AmountCents); err != nil {
+		return err
+	}
+	return s.contracts.UpdateMilestoneStatus(ctx, m.ID, contract.MilestoneCancelled, nil, "")
+}
+
+func (s *Service) milestoneAny(ctx context.Context, milestoneID uuid.UUID) (*contract.Milestone, *contract.Contract, error) {
+	m, err := s.contracts.GetMilestone(ctx, milestoneID)
+	if err != nil {
+		if errors.Is(err, contract.ErrNotFound) {
+			return nil, nil, httpx.ErrNotFound("milestone not found")
+		}
+		return nil, nil, err
+	}
+	c, err := s.contracts.GetContract(ctx, m.ContractID)
+	if err != nil {
+		return nil, nil, err
+	}
+	return m, c, nil
 }
 
 // ---- payouts --------------------------------------------------------
