@@ -14,22 +14,15 @@ async function submit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-sm">
-    <h1 class="mb-6">Вход</h1>
-    <form class="flex flex-col gap-4" @submit.prevent="submit">
-      <div class="field">
-        <label class="label">Email</label>
-        <input v-model="form.email" type="email" class="input" required />
-      </div>
-      <div class="field">
-        <label class="label">Пароль</label>
-        <input v-model="form.password" type="password" class="input" required />
-      </div>
+  <AuthCard mode="login">
+    <form class="flex flex-col gap-3" @submit.prevent="submit">
+      <input v-model="form.email" type="email" class="input" placeholder="Email" required />
+      <input v-model="form.password" type="password" class="input" placeholder="Пароль" required />
       <p v-if="error" class="text-sm text-rose-600">{{ error }}</p>
-      <button class="btn-primary" :disabled="loading">{{ loading ? 'Входим…' : 'Войти' }}</button>
+      <button class="btn-accent mt-1" :disabled="loading">{{ loading ? 'Входим…' : 'Войти' }}</button>
     </form>
     <p class="mt-4 text-sm text-slate-500">
       Нет аккаунта? <NuxtLink to="/auth/register">Зарегистрироваться</NuxtLink>
     </p>
-  </div>
+  </AuthCard>
 </template>

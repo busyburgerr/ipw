@@ -4,34 +4,42 @@ const auth = useAuthStore()
 </script>
 
 <template>
-  <section class="flex flex-col items-center gap-6 py-12 text-center">
-    <h1 class="max-w-2xl text-4xl font-bold tracking-tight text-ink">
-      Находите специалистов и работайте по безопасной сделке
-    </h1>
-    <p class="max-w-xl text-slate-600">
-      Заказчик размещает проект, фрилансер отправляет отклик. Деньги за этап
-      резервируются в escrow и выплачиваются после приёмки работы.
+  <section class="flex flex-col items-center gap-5 py-20 text-center">
+    <p class="text-sm font-medium uppercase tracking-widest text-white/70">
+      Фриланс по безопасной сделке
     </p>
-    <div class="flex gap-3">
+    <h1 class="max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl">
+      Находите специалистов и работайте через escrow
+    </h1>
+    <p class="max-w-xl text-white/80">
+      Заказчик размещает проект, фрилансер отправляет отклик. Деньги за этап
+      резервируются и выплачиваются только после приёмки работы.
+    </p>
+    <div class="mt-2 flex flex-wrap justify-center gap-3">
       <NuxtLink to="/projects" class="btn-primary no-underline">Смотреть проекты</NuxtLink>
-      <NuxtLink v-if="!auth.isAuthed" to="/auth/register" class="btn-ghost no-underline">
-        Создать аккаунт
+      <NuxtLink
+        :to="auth.isAuthed ? '/dashboard' : '/auth/register'"
+        class="btn-ghost no-underline"
+      >
+        {{ auth.isAuthed ? 'В кабинет' : 'Создать аккаунт' }}
       </NuxtLink>
-      <NuxtLink v-else to="/dashboard" class="btn-ghost no-underline">В кабинет</NuxtLink>
     </div>
 
-    <div class="mt-8 grid w-full max-w-3xl gap-4 text-left sm:grid-cols-3">
+    <div class="mt-12 grid w-full max-w-3xl gap-4 text-left sm:grid-cols-3">
       <div class="card">
-        <p class="font-semibold">1. Проект и отклики</p>
-        <p class="mt-1 text-sm text-slate-600">Опишите задачу и бюджет, соберите предложения.</p>
+        <p class="text-2xl font-extrabold text-brand">1</p>
+        <p class="mt-1 font-semibold text-ink">Проект и отклики</p>
+        <p class="mt-1 text-sm text-slate-500">Опишите задачу и бюджет, соберите предложения.</p>
       </div>
       <div class="card">
-        <p class="font-semibold">2. Контракт и этапы</p>
-        <p class="mt-1 text-sm text-slate-600">Примите оффер, разбейте работу на этапы с escrow.</p>
+        <p class="text-2xl font-extrabold text-brand">2</p>
+        <p class="mt-1 font-semibold text-ink">Контракт и этапы</p>
+        <p class="mt-1 text-sm text-slate-500">Примите оффер, разбейте работу на этапы с escrow.</p>
       </div>
       <div class="card">
-        <p class="font-semibold">3. Приёмка и выплата</p>
-        <p class="mt-1 text-sm text-slate-600">Проверьте результат — деньги уходят фрилансеру.</p>
+        <p class="text-2xl font-extrabold text-brand">3</p>
+        <p class="mt-1 font-semibold text-ink">Приёмка и выплата</p>
+        <p class="mt-1 text-sm text-slate-500">Проверьте результат — деньги уходят фрилансеру.</p>
       </div>
     </div>
   </section>

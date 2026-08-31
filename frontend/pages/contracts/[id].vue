@@ -184,20 +184,20 @@ async function submitReview() {
         </p>
 
         <div v-if="contract.status === 'active'" class="flex flex-wrap gap-2 pt-1">
-          <button v-if="isClient && m.status === 'pending'" class="btn-primary btn-sm" @click="fund(m.id)">
+          <button v-if="isClient && m.status === 'pending'" class="btn-accent btn-sm" @click="fund(m.id)">
             Оплатить в escrow
           </button>
           <button v-if="isClient && m.status === 'pending'" class="btn-ghost btn-sm" @click="milestoneAction(m.id, 'cancel')">
             Отменить
           </button>
-          <button v-if="isFreelancer && m.status === 'funded'" class="btn-primary btn-sm" @click="submitWork(m.id)">
+          <button v-if="isFreelancer && m.status === 'funded'" class="btn-accent btn-sm" @click="submitWork(m.id)">
             Сдать работу
           </button>
           <button v-if="isClient && m.status === 'funded'" class="btn-ghost btn-sm" @click="milestoneAction(m.id, 'refund')">
             Вернуть средства
           </button>
           <template v-if="isClient && m.status === 'submitted'">
-            <button class="btn-primary btn-sm" @click="milestoneAction(m.id, 'approve')">Принять и выплатить</button>
+            <button class="btn-accent btn-sm" @click="milestoneAction(m.id, 'approve')">Принять и выплатить</button>
             <button class="btn-ghost btn-sm" @click="milestoneAction(m.id, 'request-changes')">На доработку</button>
           </template>
         </div>

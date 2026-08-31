@@ -10,15 +10,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink: '#18202c',
+        ink: '#1b2430',
+        // blue accent (buttons inside cards, links, "Откликнуться")
         brand: {
-          DEFAULT: '#2f6f8f',
-          600: '#286075',
-          700: '#21566e',
+          DEFAULT: '#4a8fe0',
+          600: '#3f80e0',
+          700: '#356fc4',
+        },
+        // dark navy (primary CTA — "Зарегистрироваться")
+        navy: {
+          DEFAULT: '#2f3e57',
+          700: '#263248',
+        },
+        // page gradient stops
+        sky: {
+          from: '#6fa8ea',
+          to: '#3f80e0',
         },
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        card: '0 10px 30px -12px rgba(20, 40, 80, 0.25)',
       },
     },
   },

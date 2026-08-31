@@ -23,36 +23,34 @@ const isActive = (to: string) => route.path === to || route.path.startsWith(to +
 
 <template>
   <div class="min-h-screen">
-    <header class="border-b border-slate-200 bg-white">
-      <div class="mx-auto flex h-14 max-w-5xl items-center gap-6 px-4">
-        <NuxtLink to="/" class="font-bold text-ink no-underline">фриланс-биржа</NuxtLink>
-        <nav class="flex items-center gap-4 text-sm">
-          <NuxtLink
-            v-for="item in nav"
-            :key="item.to"
-            :to="item.to"
-            class="no-underline"
-            :class="isActive(item.to) ? 'font-semibold text-brand-700' : 'text-slate-600 hover:text-slate-900'"
-          >
-            {{ item.label }}
+    <header class="mx-auto flex h-16 max-w-5xl items-center gap-8 px-4">
+      <NuxtLink to="/" class="text-xl font-extrabold tracking-wide text-white no-underline">IPW</NuxtLink>
+      <nav class="hidden items-center gap-6 text-sm sm:flex">
+        <NuxtLink
+          v-for="item in nav"
+          :key="item.to"
+          :to="item.to"
+          class="no-underline transition"
+          :class="isActive(item.to) ? 'font-semibold text-white' : 'text-white/70 hover:text-white'"
+        >
+          {{ item.label }}
+        </NuxtLink>
+      </nav>
+      <div class="ml-auto flex items-center gap-3 text-sm">
+        <template v-if="auth.isAuthed">
+          <NuxtLink to="/profile/edit" class="text-white/80 no-underline hover:text-white">
+            {{ auth.user?.displayName || auth.user?.email }}
           </NuxtLink>
-        </nav>
-        <div class="ml-auto flex items-center gap-3 text-sm">
-          <template v-if="auth.isAuthed">
-            <NuxtLink to="/dashboard" class="text-slate-600 no-underline hover:text-slate-900">
-              {{ auth.user?.displayName || auth.user?.email }}
-            </NuxtLink>
-            <button class="btn-ghost btn-sm" @click="logout">Выйти</button>
-          </template>
-          <template v-else>
-            <NuxtLink to="/auth/login" class="text-slate-600 no-underline hover:text-slate-900">Войти</NuxtLink>
-            <NuxtLink to="/auth/register" class="btn-primary btn-sm no-underline">Регистрация</NuxtLink>
-          </template>
-        </div>
+          <button class="btn-ghost btn-sm" @click="logout">Выйти</button>
+        </template>
+        <template v-else>
+          <NuxtLink to="/auth/login" class="text-white/80 no-underline hover:text-white">Войти</NuxtLink>
+          <NuxtLink to="/auth/register" class="btn-ghost btn-sm no-underline">Регистрация</NuxtLink>
+        </template>
       </div>
     </header>
 
-    <main class="mx-auto max-w-5xl px-4 py-8">
+    <main class="mx-auto max-w-5xl px-4 pb-16 pt-4">
       <slot />
     </main>
   </div>

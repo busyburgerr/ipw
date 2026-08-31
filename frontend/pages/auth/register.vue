@@ -20,37 +20,27 @@ async function submit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-sm">
-    <h1 class="mb-6">Регистрация</h1>
-    <form class="flex flex-col gap-4" @submit.prevent="submit">
-      <div class="field">
-        <label class="label">Имя</label>
-        <input v-model="form.displayName" class="input" required />
-      </div>
-      <div class="field">
-        <label class="label">Email</label>
-        <input v-model="form.email" type="email" class="input" required />
-      </div>
-      <div class="field">
-        <label class="label">Пароль</label>
-        <input v-model="form.password" type="password" class="input" minlength="8" required />
-      </div>
-      <fieldset class="flex flex-col gap-2">
-        <span class="label">Я хочу</span>
-        <label class="flex items-center gap-2 text-sm">
-          <input v-model="form.asFreelancer" type="checkbox" /> выполнять заказы (фрилансер)
+  <AuthCard mode="register">
+    <form class="flex flex-col gap-3" @submit.prevent="submit">
+      <input v-model="form.displayName" class="input" placeholder="Имя" required />
+      <input v-model="form.email" type="email" class="input" placeholder="Email" required />
+      <input v-model="form.password" type="password" class="input" placeholder="Пароль (мин. 8)" minlength="8" required />
+      <div class="mt-1 flex flex-col gap-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
+        <span class="font-medium">Я хочу</span>
+        <label class="flex items-center gap-2">
+          <input v-model="form.asFreelancer" type="checkbox" /> выполнять заказы
         </label>
-        <label class="flex items-center gap-2 text-sm">
-          <input v-model="form.asClient" type="checkbox" /> размещать заказы (заказчик)
+        <label class="flex items-center gap-2">
+          <input v-model="form.asClient" type="checkbox" /> размещать заказы
         </label>
-      </fieldset>
+      </div>
       <p v-if="error" class="text-sm text-rose-600">{{ error }}</p>
-      <button class="btn-primary" :disabled="loading || (!form.asFreelancer && !form.asClient)">
+      <button class="btn-accent mt-1" :disabled="loading || (!form.asFreelancer && !form.asClient)">
         {{ loading ? 'Создаём…' : 'Создать аккаунт' }}
       </button>
     </form>
     <p class="mt-4 text-sm text-slate-500">
       Уже есть аккаунт? <NuxtLink to="/auth/login">Войти</NuxtLink>
     </p>
-  </div>
+  </AuthCard>
 </template>

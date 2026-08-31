@@ -124,7 +124,7 @@ async function closeProject() {
         </p>
         <p class="whitespace-pre-wrap text-sm text-slate-700">{{ p.coverLetter }}</p>
         <div v-if="['pending', 'shortlisted'].includes(p.status)" class="flex gap-2 pt-1">
-          <button class="btn-primary btn-sm" @click="proposalAction(p.id, 'accept')">Принять</button>
+          <button class="btn-accent btn-sm" @click="proposalAction(p.id, 'accept')">Принять</button>
           <button
             v-if="p.status === 'pending'"
             class="btn-ghost btn-sm"
@@ -158,7 +158,7 @@ async function closeProject() {
           </div>
         </div>
         <p v-if="propose.error.value" class="text-sm text-rose-600">{{ propose.error.value }}</p>
-        <button class="btn-primary w-fit" :disabled="propose.loading.value">Отправить отклик</button>
+        <button class="btn-accent w-fit" :disabled="propose.loading.value">Отправить отклик</button>
       </form>
     </div>
 
