@@ -1,46 +1,88 @@
-<script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-const auth = useAuthStore()
+<template>
+  <div class="container">
+    <div class="centName">Здесь вы сможете создать своё Резюме!</div>
+    <div class="name">IT Professionals Work</div>
+    <NuxtLink class="btn" :to="linkToProfileOrAuth">{{ linkText }}</NuxtLink>
+  </div>
+  <div class="modal_window-notice" v-if="showNotice">
+    <NoticeComponent :closeModal="closeNotice"/>
+  </div>
+</template>
+
+<script lang="ts">
+import Cookies from 'js-cookie'
+import {ref, defineComponent} from "vue";
+import UserDataComponent from "@/components/UserDataComponent.vue";
+import NoticeComponent from "~/components/NoticeComponent.vue";
+export default defineComponent({
+  UserDataComponent,
+  NoticeComponent,
+  setup() {
+    const showNotice = ref(true)
+    const closeNotice = () => {
+      showNotice.value = false
+    }
+    const checkVisited = () => {
+      const visited = localStorage.getItem("visited")
+      if (visited) {
+        showNotice.value = false
+      } else {
+        showNotice.value = true
+        localStorage.setItem("visited", "true")
+      }
+    }
+    onMounted(() => {
+      checkVisited()
+    })
+    return {
+      showNotice,
+      closeNotice
+    }
+  },
+  computed: {
+    linkToProfileOrAuth() {
+      const isAuth = Cookies.get("ipw")
+      return isAuth ? "/profile" : "/auth";
+    },
+    linkText() {
+      const isAuth = Cookies.get("ipw")
+      return isAuth ? "Профиль" : "Регистрация / Авторизация"
+    }
+  }
+})
 </script>
 
-<template>
-  <section class="flex flex-col items-center gap-5 py-20 text-center">
-    <p class="text-sm font-medium uppercase tracking-widest text-white/70">
-      Фриланс по безопасной сделке
-    </p>
-    <h1 class="max-w-3xl text-4xl font-extrabold leading-tight text-white sm:text-5xl">
-      Находите специалистов и работайте через escrow
-    </h1>
-    <p class="max-w-xl text-white/80">
-      Заказчик размещает проект, фрилансер отправляет отклик. Деньги за этап
-      резервируются и выплачиваются только после приёмки работы.
-    </p>
-    <div class="mt-2 flex flex-wrap justify-center gap-3">
-      <NuxtLink to="/projects" class="btn-primary no-underline">Смотреть проекты</NuxtLink>
-      <NuxtLink
-        :to="auth.isAuthed ? '/dashboard' : '/auth/register'"
-        class="btn-ghost no-underline"
-      >
-        {{ auth.isAuthed ? 'В кабинет' : 'Создать аккаунт' }}
-      </NuxtLink>
-    </div>
 
-    <div class="mt-12 grid w-full max-w-3xl gap-4 text-left sm:grid-cols-3">
-      <div class="card">
-        <p class="text-2xl font-extrabold text-brand">1</p>
-        <p class="mt-1 font-semibold text-ink">Проект и отклики</p>
-        <p class="mt-1 text-sm text-slate-500">Опишите задачу и бюджет, соберите предложения.</p>
-      </div>
-      <div class="card">
-        <p class="text-2xl font-extrabold text-brand">2</p>
-        <p class="mt-1 font-semibold text-ink">Контракт и этапы</p>
-        <p class="mt-1 text-sm text-slate-500">Примите оффер, разбейте работу на этапы с escrow.</p>
-      </div>
-      <div class="card">
-        <p class="text-2xl font-extrabold text-brand">3</p>
-        <p class="mt-1 font-semibold text-ink">Приёмка и выплата</p>
-        <p class="mt-1 text-sm text-slate-500">Проверьте результат — деньги уходят фрилансеру.</p>
-      </div>
-    </div>
-  </section>
-</template>
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 25px;
+  width: 100%;
+  height: calc(100vh - 80px);
+}
+.centName {
+  color: #FFF;
+  font-family: Raleway, sans-serif;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+}
+.name {
+  font-family: Raleway, sans-serif;
+  font-size: 64px;
+}
+.btn {
+  font-family: Raleway, sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  padding: 16px 84px;
+  color:#fff;
+
+  background-color: #325181;
+  border-radius: 12px;
+}
+</style>
