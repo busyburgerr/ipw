@@ -160,6 +160,19 @@ func (s *PostgresStore) SetFreelancerSkills(ctx context.Context, userID uuid.UUI
 	})
 }
 
+// SetFreelancerRating updates the denormalised reputation aggregate. Owned by
+// the review feature.
+func (s *PostgresStore) SetFreelancerRating(ctx context.Context, userID uuid.UUID, avg float64, count int) error {
+	return s.db.WithContext(ctx).Model(&freelancerRow{}).Where("user_id = ?", userID).
+		Updates(map[string]any{"rating_avg": avg, "rating_count": count, "updated_at": time.Now()}).Error
+}
+
+// SetClientRating mirrors SetFreelancerRating for client profiles.
+func (s *PostgresStore) SetClientRating(ctx context.Context, userID uuid.UUID, avg float64, count int) error {
+	return s.db.WithContext(ctx).Model(&clientRow{}).Where("user_id = ?", userID).
+		Updates(map[string]any{"rating_avg": avg, "rating_count": count, "updated_at": time.Now()}).Error
+}
+
 func (s *PostgresStore) GetClient(ctx context.Context, userID uuid.UUID) (*Client, error) {
 	var row clientRow
 	err := s.db.WithContext(ctx).First(&row, "user_id = ?", userID).Error

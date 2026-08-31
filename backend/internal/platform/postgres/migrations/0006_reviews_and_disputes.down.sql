@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS disputes;
+DROP TABLE IF EXISTS reviews;

@@ -110,6 +110,13 @@ func UserID(c *fiber.Ctx) uuid.UUID {
 	return id
 }
 
+// IsAdmin reports whether the caller's token carries the admin capability. Only
+// meaningful after RequireAuth or OptionalAuth.
+func IsAdmin(c *fiber.Ctx) bool {
+	claims, ok := c.Locals(localsClaims).(*Claims)
+	return ok && claims.IsAdmin
+}
+
 func bearerToken(c *fiber.Ctx) string {
 	if h := c.Get(fiber.HeaderAuthorization); h != "" {
 		if after, ok := strings.CutPrefix(h, "Bearer "); ok {
