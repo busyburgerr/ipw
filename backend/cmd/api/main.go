@@ -11,10 +11,13 @@ import (
 	"time"
 
 	"ipw/internal/auth"
+	"ipw/internal/catalog"
 	"ipw/internal/config"
 	"ipw/internal/httpx"
 	"ipw/internal/platform/postgres"
 	"ipw/internal/platform/redis"
+	"ipw/internal/platform/storage"
+	"ipw/internal/profile"
 	"ipw/internal/user"
 )
 
@@ -53,6 +56,13 @@ func run(log *slog.Logger) error {
 	log.Info("redis connected")
 	defer func() { _ = rdb.Close() }()
 
+	ctx := context.Background()
+	files, err := storage.New(ctx, cfg.Storage)
+	if err != nil {
+		return err
+	}
+	log.Info("object storage ready")
+
 	app := httpx.NewServer(cfg, log)
 
 	// --- Feature wiring -------------------------------------------------------
@@ -61,6 +71,17 @@ func run(log *slog.Logger) error {
 	authSvc := auth.NewService(users, db, cfg.Auth)
 	authMW := auth.NewMiddleware(cfg.Auth)
 	auth.NewHandler(authSvc, authMW, cfg.Auth).Register(app)
+
+	catalogStore := catalog.NewPostgresStore(db)
+	if err := catalog.Seed(ctx, catalogStore); err != nil {
+		return err
+	}
+	log.Info("catalog seeded")
+	catalog.NewHandler(catalogStore).Register(app)
+
+	profileStore := profile.NewPostgresStore(db)
+	profileSvc := profile.NewService(profileStore, catalogStore)
+	profile.NewHandler(profileSvc, users, catalogStore, files, authMW).Register(app)
 	// Additional feature routers are registered here as they are built.
 	// -----------------------------------------------------------------------
 

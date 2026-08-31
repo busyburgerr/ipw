@@ -15,12 +15,13 @@ import (
 )
 
 type Config struct {
-	Env   string // "dev" | "staging" | "prod"
-	HTTP  HTTPConfig
-	DB    DBConfig
-	Redis RedisConfig
-	Auth  AuthConfig
-	Lava  LavaConfig
+	Env     string // "dev" | "staging" | "prod"
+	HTTP    HTTPConfig
+	DB      DBConfig
+	Redis   RedisConfig
+	Auth    AuthConfig
+	Lava    LavaConfig
+	Storage StorageConfig
 }
 
 type HTTPConfig struct {
@@ -65,6 +66,16 @@ type LavaConfig struct {
 	BaseURL    string
 }
 
+// StorageConfig points at an S3-compatible object store (MinIO locally).
+type StorageConfig struct {
+	Endpoint      string // host:port, no scheme
+	AccessKey     string
+	SecretKey     string
+	Bucket        string
+	UseSSL        bool
+	PublicBaseURL string // where objects are served from, e.g. http://localhost:9000/ipw
+}
+
 // Load reads configuration. It loads .env if present (dev convenience) and then
 // resolves every value from the environment, failing fast on missing required
 // secrets.
@@ -101,6 +112,14 @@ func Load() (Config, error) {
 			APIKey:     os.Getenv("LAVA_API_KEY"),
 			WebhookKey: os.Getenv("LAVA_WEBHOOK_KEY"),
 			BaseURL:    env("LAVA_BASE_URL", "https://gate.lava.top"),
+		},
+		Storage: StorageConfig{
+			Endpoint:      env("STORAGE_ENDPOINT", "localhost:9000"),
+			AccessKey:     env("STORAGE_ACCESS_KEY", "ipw"),
+			SecretKey:     env("STORAGE_SECRET_KEY", "ipw_local_dev"),
+			Bucket:        env("STORAGE_BUCKET", "ipw"),
+			UseSSL:        envBool("STORAGE_USE_SSL", false),
+			PublicBaseURL: env("STORAGE_PUBLIC_BASE_URL", "http://localhost:9000/ipw"),
 		},
 	}
 
