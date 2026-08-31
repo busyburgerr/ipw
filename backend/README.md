@@ -29,13 +29,38 @@ GORM models.
 
 ## Local development
 
+Prerequisites: Go 1.26+, Docker Desktop.
+
 ```sh
-cp .env.example .env          # then set JWT_SECRET (openssl rand -hex 32)
-make up                       # postgres + redis + minio via docker compose
-make run                      # applies migrations on boot, listens on :5000
+cp .env.example .env
+# set a real JWT_SECRET:  openssl rand -hex 32   (must be >= 32 chars)
+
+docker compose up -d          # postgres + redis + minio
+go run ./cmd/api              # applies migrations + seeds catalog on boot, listens on :5000
 ```
 
-Other targets: `make test`, `make lint`, `make build`, `make migrate-create name=add_projects`.
+Health check: `curl localhost:5000/healthz` → `{"status":"ok"}`.
+Stop infra when done: `docker compose down` (add `-v` to wipe data).
+
+With `make` (optional): `make up`, `make run`, `make test`, `make lint`,
+`make build`, `make migrate-create name=add_x`.
+
+### Payments in dev
+
+`LAVA_API_KEY` is blank in `.env.example`, so a **stub payment provider** is
+used. Fund a milestone, then confirm the fake payment:
+
+```sh
+curl -X POST localhost:5000/api/v1/dev/payments/<paymentId>/pay
+```
+
+Set real `LAVA_API_KEY` / `LAVA_WEBHOOK_KEY` / `LAVA_OFFER_ID` to switch to
+lava.top; the webhook lands at `POST /api/v1/payments/webhook`.
+
+### Trying the full flow
+
+`scripts/e2e/test_phase*.py` drive the whole marketplace flow end to end with
+`urllib` — a good reference for the API. See `scripts/e2e/README.md`.
 
 ## Payments
 
